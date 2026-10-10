@@ -7,11 +7,3 @@ urlpatterns = [
     path('editar/<int:pk>/', views.editar_colaborador, name='editar_colaborador'),
     path('excluir/<int:pk>/', views.excluir_colaborador, name='excluir_colaborador'),
 ]
-
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('colaboradores/', include('colaboradores.urls')),
-]

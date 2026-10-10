@@ -20,7 +20,7 @@ def criar_colaborador(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Colaborador cadastrado com sucesso!')
-            return redirect('criar_colaborador') # Permanece na tela de cadastro conforme requisito
+            return redirect('criar_colaborador')
         else:
             messages.error(request, 'Erro ao cadastrar colaborador. Verifique os dados inseridos.')
     else:
