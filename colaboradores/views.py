@@ -1,0 +1,50 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.db.models import Q
+from .models import Colaborador
+from .forms import ColaboradorForm
+
+def listar_colaboradores(request):
+    query = request.GET.get('q', '')
+    if query:
+        colaboradores = Colaborador.objects.filter(
+            Q(nome__icontains=query) | Q(cpf__icontains=query) | Q(cargo__icontains=query)
+        )
+    else:
+        colaboradores = Colaborador.objects.all()
+    return render(request, 'colaboradores/listar.html', {'colaboradores': colaboradores, 'query': query})
+
+def criar_colaborador(request):
+    if request.method == 'POST':
+        form = ColaboradorForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Colaborador cadastrado com sucesso!')
+            return redirect('criar_colaborador') # Permanece na tela de cadastro conforme requisito
+        else:
+            messages.error(request, 'Erro ao cadastrar colaborador. Verifique os dados inseridos.')
+    else:
+        form = ColaboradorForm()
+    return render(request, 'colaboradores/form.html', {'form': form, 'titulo': 'Cadastrar Colaborador'})
+
+def editar_colaborador(request, pk):
+    colaborador = get_object_or_404(Colaborador, pk=pk)
+    if request.method == 'POST':
+        form = ColaboradorForm(request.POST, instance=colaborador)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Colaborador atualizado com sucesso!')
+            return redirect('listar_colaboradores')
+        else:
+            messages.error(request, 'Erro ao atualizar colaborador.')
+    else:
+        form = ColaboradorForm(instance=colaborador)
+    return render(request, 'colaboradores/form.html', {'form': form, 'titulo': 'Editar Colaborador'})
+
+def excluir_colaborador(request, pk):
+    colaborador = get_object_or_404(Colaborador, pk=pk)
+    if request.method == 'POST':
+        colaborador.delete()
+        messages.success(request, 'Colaborador excluído com sucesso!')
+        return redirect('listar_colaboradores')
+    return render(request, 'colaboradores/confirmar_exclusao.html', {'colaborador': colaborador})
